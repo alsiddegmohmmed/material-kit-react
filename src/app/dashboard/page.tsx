@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Grid from '@mui/material/Unstable_Grid2';
@@ -13,13 +15,36 @@ import { TotalCustomers } from '@/components/dashboard/overview/total-customers'
 import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { Traffic } from '@/components/dashboard/overview/traffic';
 
-export const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
+const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
+  const [revenue, setRevenue] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(true);
+
+  React.useEffect(() => {
+    async function fetchRevenue() {
+      try {
+        const response = await fetch('http://localhost:5000/api/revenue/thisMonth'); // Adjust the URL if needed
+        const data = await response.json();
+        setRevenue(`$${data.revenue}`);
+      } catch (error) {
+        console.error('Error fetching revenue:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchRevenue();
+  }, []);
+
   return (
     <Grid container spacing={3}>
       <Grid lg={3} sm={6} xs={12}>
-        <Budget diff={12} trend="up" sx={{ height: '100%' }} value="$24k" />
+        {!loading && revenue ? (
+          <Budget diff={12} trend="up" sx={{ height: '100%' }} value={revenue} />
+        ) : (
+          <div>Loading...</div>
+        )}
       </Grid>
       <Grid lg={3} sm={6} xs={12}>
         <TotalCustomers diff={16} trend="down" sx={{ height: '100%' }} value="1.6k" />

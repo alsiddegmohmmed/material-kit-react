@@ -7,7 +7,7 @@
   "private": false,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "tsc",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -32,6 +32,7 @@
     "@phosphor-icons/react": "2.1.6",
     "apexcharts": "3.49.2",
     "dayjs": "1.11.11",
+    "mongoose": "^8.4.5",
     "next": "14.2.4",
     "react": "18.3.1",
     "react-apexcharts": "1.4.1",
@@ -56,6 +57,6 @@
     "jest": "29.7.0",
     "jest-environment-jsdom": "29.7.0",
     "prettier": "3.3.2",
-    "typescript": "5.5.2"
+    "typescript": "^5.5.2"
   }
 }
