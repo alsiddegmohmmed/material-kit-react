@@ -1,8 +1,8 @@
-"use client"
+"use client" 
 
 import * as React from 'react';
 import type { Metadata } from 'next';
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid';
 import dayjs from 'dayjs';
 
 import { config } from '@/config';
@@ -14,48 +14,142 @@ import { TasksProgress } from '@/components/dashboard/overview/tasks-progress';
 import { TotalCustomers } from '@/components/dashboard/overview/total-customers';
 import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { Traffic } from '@/components/dashboard/overview/traffic';
+import { TotalProfitWeek } from '@/components/dashboard/overview/total-profit-week';
+import { TotalProfitToday } from '@/components/dashboard/overview/total-profit-today';
 
-const metadata = { title: `Overview | Dashboard | ${config.site.name}` } satisfies Metadata;
+const metadata: Metadata = { title: `Overview | Dashboard | ${config.site.name}` };
 
-export default function Page(): React.JSX.Element {
-  const [revenue, setRevenue] = React.useState<string | null>(null);
-  const [loading, setLoading] = React.useState<boolean>(true);
+interface RevenueResponse {
+  revenue: number;
+}
+
+interface OrdersResponse {
+  count: number;
+}
+
+export default function Page(): React.ReactElement {
+  const [thisMonthRevenue, setThisMonthRevenue] = React.useState<string | null>(null);
+  const [thisWeekRevenue, setThisWeekRevenue] = React.useState<string | null>(null);
+  const [todayRevenue, setTodayRevenue] = React.useState<string | null>(null);
+  const [thisMonthOrders, setThisMonthOrders] = React.useState<string | null>(null);
+  const [thisWeekOrders, setThisWeekOrders] = React.useState<string | null>(null);
+  const [todaysOrders, setTodaysOrders] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    async function fetchRevenue() {
+    async function fetchThisMonthRevenue(): Promise<void> {
       try {
-        const response = await fetch('http://localhost:5000/api/revenue/thisMonth'); // Adjust the URL if needed
-        const data = await response.json();
-        setRevenue(`$${data.revenue}`);
+        const response = await fetch('http://localhost:5000/api/revenue/thisMonth');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: RevenueResponse = await response.json();
+        setThisMonthRevenue(`$${data.revenue}`);
       } catch (error) {
-        console.error('Error fetching revenue:', error);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching thisMonthRevenue:', error);
       }
     }
 
-    fetchRevenue();
+    async function fetchThisWeekRevenue(): Promise<void> {
+      try {
+        const response = await fetch('http://localhost:5000/api/revenue/thisWeek');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: RevenueResponse = await response.json();
+        setThisWeekRevenue(`$${data.revenue}`);
+      } catch (error) {
+        console.error('Error fetching thisWeekRevenue:', error);
+      }
+    }
+
+    async function fetchTodayRevenue(): Promise<void> {
+      try {
+        const response = await fetch('http://localhost:5000/api/revenue/today');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: RevenueResponse = await response.json();
+        setTodayRevenue(`$${data.revenue}`);
+      } catch (error) {
+        console.error('Error fetching todayRevenue:', error);
+      }
+    }
+
+    async function fetchThisMonthOrders(): Promise<void> {
+      try {
+        const response = await fetch('http://localhost:5000/api/orders/thisMonth');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: OrdersResponse = await response.json();
+        setThisMonthOrders(`${data.count} orders`);
+      } catch (error) {
+        console.error('Error fetching thisMonthOrders:', error);
+      }
+    }
+
+    async function fetchThisWeekOrders(): Promise<void> {
+      try {
+        const response = await fetch('http://localhost:5000/api/orders/thisWeek');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: OrdersResponse = await response.json();
+        setThisWeekOrders(`${data.count} orders`);
+      } catch (error) {
+        console.error('Error fetching thisWeekOrders:', error);
+      }
+    }
+
+    async function fetchTodaysOrders(): Promise<void> {
+      try {
+        const response = await fetch('http://localhost:5000/api/orders/today');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: OrdersResponse = await response.json();
+        console.log(data); // Check what data is returned
+        setTodaysOrders(`${data.count} orders`);
+      } catch (error) {
+        console.error('Error fetching todaysOrders:', error);
+      }
+    }
+
+    fetchThisMonthRevenue();
+    fetchThisWeekRevenue();
+    fetchTodayRevenue();
+    fetchThisMonthOrders();
+    fetchThisWeekOrders();
+    fetchTodaysOrders();
   }, []);
 
   return (
     <Grid container spacing={3}>
-      <Grid lg={3} sm={6} xs={12}>
-        {!loading && revenue ? (
-          <Budget diff={12} trend="up" sx={{ height: '100%' }} value={revenue} />
-        ) : (
-          <div>Loading...</div>
-        )}
+      
+      <Grid container item spacing={3}>
+        <Grid item lg={4} sm={6} xs={12}>
+          <TotalProfit sx={{ height: '100%' }} value={thisMonthOrders} />
+        </Grid>
+        <Grid item lg={4} sm={6} xs={12}>
+          <TotalProfitWeek sx={{ height: '100%' }} value={thisWeekOrders} />
+        </Grid>
+        <Grid item lg={4} sm={6} xs={12}>
+          <TotalProfitToday sx={{ height: '100%' }} value={todaysOrders} />
+        </Grid>
       </Grid>
-      <Grid lg={3} sm={6} xs={12}>
-        <TotalCustomers diff={16} trend="down" sx={{ height: '100%' }} value="1.6k" />
+
+      <Grid container item spacing={3}>
+        <Grid item lg={4} sm={6} xs={12}>
+          <Budget diff={12} trend="up" sx={{ height: '100%' }} value={thisMonthRevenue} />
+        </Grid>
+        <Grid item lg={4} sm={6} xs={12}>
+          <TotalCustomers diff={16} trend="down" sx={{ height: '100%' }} value={thisWeekRevenue} />
+        </Grid>
+        <Grid item lg={4} sm={6} xs={12}>
+          <TasksProgress sx={{ height: '100%' }} value={todayRevenue} />
+        </Grid>
       </Grid>
-      <Grid lg={3} sm={6} xs={12}>
-        <TasksProgress sx={{ height: '100%' }} value={75.5} />
-      </Grid>
-      <Grid lg={3} sm={6} xs={12}>
-        <TotalProfit sx={{ height: '100%' }} value="$15k" />
-      </Grid>
-      <Grid lg={8} xs={12}>
+      <Grid item lg={8} xs={12}>
         <Sales
           chartSeries={[
             { name: 'This year', data: [18, 16, 5, 8, 3, 14, 14, 16, 17, 19, 18, 20] },
@@ -64,10 +158,10 @@ export default function Page(): React.JSX.Element {
           sx={{ height: '100%' }}
         />
       </Grid>
-      <Grid lg={4} md={6} xs={12}>
+      <Grid item lg={4} md={6} xs={12}>
         <Traffic chartSeries={[63, 15, 22]} labels={['Desktop', 'Tablet', 'Phone']} sx={{ height: '100%' }} />
       </Grid>
-      <Grid lg={4} md={6} xs={12}>
+      <Grid item lg={4} md={6} xs={12}>
         <LatestProducts
           products={[
             {
@@ -104,7 +198,7 @@ export default function Page(): React.JSX.Element {
           sx={{ height: '100%' }}
         />
       </Grid>
-      <Grid lg={8} md={12} xs={12}>
+      <Grid item lg={8} md={12} xs={12}>
         <LatestOrders
           orders={[
             {

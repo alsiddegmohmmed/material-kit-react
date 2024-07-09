@@ -12,14 +12,14 @@ export interface TotalProfitProps {
   value: string;
 }
 
-export function TotalProfit({ value, sx }: TotalProfitProps): React.JSX.Element {
+export function TotalProfitWeek({ value, sx }: TotalProfitProps): React.JSX.Element {
   return (
     <Card sx={sx}>
       <CardContent>
         <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }} spacing={3}>
           <Stack spacing={1}>
             <Typography color="text.secondary" variant="overline">
-              this months's orders
+             THIS WEEK'S ORDERS
             </Typography>
             <Typography variant="h4">{value}</Typography>
           </Stack>

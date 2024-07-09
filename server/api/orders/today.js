@@ -1,11 +1,10 @@
 // pages/api/orders/today.js
 
-import { mongooseConnect } from "@/lib/mongoose";
-
-import { Order } from '@/pages/Order';
+import { mongooseConnect } from "../../lib/mongoose.js";
+import Order from "../../models/order.js";
 import dayjs from 'dayjs';
 
-export default async function handler(req, res) {
+export default async function todayOrdersHandler(req, res) {
   await  mongooseConnect();
 
   const startOfDay = dayjs().startOf('day').toDate();

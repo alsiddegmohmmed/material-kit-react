@@ -6,6 +6,13 @@ import dayjs from 'dayjs';
 import { mongooseConnect } from './lib/mongoose.js'; // Adjusted import path
 import Order from './models/order.js'; // Adjusted import path
 import dotenv from 'dotenv';
+import thisMonthRevenueHandler from './api/revenue/thisMonth.js';
+import thisWeekRevenueHandler from './api/revenue/thisWeek.js'
+import todayRevenueHandler from './api/revenue/today.js';
+import thisMonthOrdersHandler from './api/orders/thisMonth.js';
+import thisWeekOrdersHandler from './api/orders/thisWeek.js';
+import todayOrdersHandler from './api/orders/today.js';
+
 dotenv.config();
 
 const app = express();
@@ -31,34 +38,13 @@ app.get('/', (req, res) => {
 });
 
 // API endpoint for current month's revenue
-app.get('/api/revenue/thisMonth', async (req, res) => {
-  try {
-    // Calculate start and end of the current month
-    const startOfMonth = dayjs().startOf('month').toDate();
-    const endOfMonth = dayjs().endOf('month').toDate();
+app.get('/api/revenue/thisMonth', thisMonthRevenueHandler); // Use the handler function
+app.get('/api/revenue/thisWeek', thisWeekRevenueHandler); // Use the handler function
+app.get('/api/revenue/today', todayRevenueHandler); // Use the handler function
+app.get('/api/orders/thisMonth', thisMonthOrdersHandler); // Use the handler function
+app.get('/api/orders/thisWeek', thisWeekOrdersHandler); // Use the handler function
+app.get('/api/orders/today',todayOrdersHandler); // Use the handler function
 
-    // Query orders within the current month that are paid
-    const orders = await Order.find({
-      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
-      paid: true,
-    });
-
-    // Calculate total revenue from the fetched orders
-    const totalRevenue = orders.reduce((acc, order) => {
-      const orderRevenue = order.line_items.reduce((lineAcc, item) => {
-        return lineAcc + (item.price_data.unit_amount * item.quantity / 100); // unit_amount is in cents
-      }, 0);
-      return acc + orderRevenue;
-    }, 0);
-
-    // Respond with the total revenue as JSON
-    res.status(200).json({ revenue: totalRevenue });
-  } catch (error) {
-    // Handle errors if any occur during the process
-    console.error('Error fetching revenue:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 // Start the server
 app.listen(port, () => {

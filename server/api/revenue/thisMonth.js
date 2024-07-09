@@ -4,7 +4,7 @@ import { mongooseConnect } from '../../lib/mongoose.js'; // Adjusted import path
 import Order from '../../models/order.js'; // Adjusted import path
 import dayjs from 'dayjs';
 
-export default async function handler(req, res) {
+export default async function thisMonthRevenueHandler(req, res) {
   try {
     await mongooseConnect();
 

@@ -1,10 +1,10 @@
 // pages/api/orders/thisMonth.js
 
-import { mongooseConnect } from "@/lib/mongoose";
-import { Order } from "../../../models/order";
+import { mongooseConnect } from "../../lib/mongoose.js";
+import Order from "../../models/order.js";
 import dayjs from 'dayjs';
 
-export default async function handler(req, res) {
+export default async function thisMonthOrdershandler(req, res) {
   await mongooseConnect();
 
   const startOfMonth = dayjs().startOf('month').toDate();
