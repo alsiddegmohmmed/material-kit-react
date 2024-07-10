@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { config } from '@/config';
 import { Budget } from '@/components/dashboard/overview/budget';
 import { LatestOrders } from '@/components/dashboard/overview/latest-orders';
-import { LatestProducts } from '@/components/dashboard/overview/latest-products';
+import { LatestProductsContainer } from '@/components/dashboard/overview/latest-products';
 import { Sales } from '@/components/dashboard/overview/sales';
 import { TasksProgress } from '@/components/dashboard/overview/tasks-progress';
 import { TotalCustomers } from '@/components/dashboard/overview/total-customers';
@@ -100,10 +100,8 @@ export default function Page(): React.ReactElement {
           sx={{ height: '100%' }}
         />
       </Grid>
-    
-
       <Grid item lg={4} md={6} xl={3} xs={12}>
-        <LatestProducts sx={{ height: '100%' }} />
+        <LatestProductsContainer sx={{ height: '100%' }} />
       </Grid>
       <Grid item lg={8} md={12} xl={9} xs={12}>
         <LatestOrders />

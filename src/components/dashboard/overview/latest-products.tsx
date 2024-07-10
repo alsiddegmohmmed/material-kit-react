@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -75,3 +75,31 @@ export function LatestProducts({ products = [], sx }: LatestProductsProps): Reac
     </Card>
   );
 }
+
+export const LatestProductsContainer = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/products');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setProducts(data.map((product: any) => ({
+          id: product._id,
+          image: product.images[0] || '',
+          name: product.title,
+          updatedAt: product.updatedAt,
+        })));
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  return <LatestProducts products={products} />;
+};
