@@ -13,7 +13,7 @@ export default async function thisWeekRevenueHandler(req, res) {
 
   const orders = await Order.find({
     createdAt: { $gte: startOfWeek, $lt: endOfWeek },
-    paid: true,
+    
   });
 
   const totalRevenue = orders.reduce((acc, order) => {

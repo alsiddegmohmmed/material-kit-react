@@ -91,15 +91,20 @@ export default function Page(): React.ReactElement {
         </Grid>
       </Grid>
       <Grid item lg={8} xs={12}>
-        <Sales
-          chartSeries={[
-            { name: 'This month', data: [thisMonthRevenue || 0] },
-            { name: 'This week', data: [thisWeekRevenue || 0] },
-            { name: 'Today', data: [todayRevenue || 0] },
-          ]}
-          sx={{ height: '100%' }}
-        />
-      </Grid>
+      <Sales
+  chartSeries={[
+    { name: 'This month - Revenue', data: [thisMonthRevenue || 0, 0, 0] },
+    { name: 'This week - Revenue', data: [0, thisWeekRevenue || 0, 0] },
+    { name: 'Today - Revenue', data: [0, 0, todayRevenue || 0] },
+    { name: 'This month - Orders', data: [thisMonthOrders || 0, 0, 0] },
+    { name: 'This week - Orders', data: [0, thisWeekOrders || 0, 0] },
+    { name: 'Today - Orders', data: [0, 0, todaysOrders || 0] },
+  ]}
+  sx={{ height: '100%' }}
+/>
+
+
+</Grid>
       <Grid item lg={4} md={6} xl={3} xs={12}>
         <LatestProductsContainer sx={{ height: '100%' }} />
       </Grid>

@@ -12,7 +12,7 @@ export default async function todayRevenueHandler(req, res) {
   
     const orders = await Order.find({
       createdAt: { $gte: startOfDay, $lt: endOfDay },
-      paid: true,
+      
     });
   
     const totalRevenue = orders.reduce((acc, order) => {

@@ -15,7 +15,7 @@ export default async function thisMonthRevenueHandler(req, res) {
     // Query orders within the current month that are paid
     const orders = await Order.find({
       createdAt: { $gte: startOfMonth, $lt: endOfMonth },
-      paid: true,
+      
     });
 
     // Calculate total revenue from the fetched orders
