@@ -14,6 +14,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowRight';
 import dayjs from 'dayjs';
+import axios from 'axios';
 
 const statusMap = {
   pending: { label: 'Pending', color: 'warning' },
@@ -22,11 +23,10 @@ const statusMap = {
 } as const;
 
 export interface Order {
-  id: string;
-  customer: { name: string };
-  amount: number;
-  status: 'pending' | 'delivered' | 'refunded';
+  _id: string;
+  name: string;
   createdAt: Date;
+  // Add other fields if necessary
 }
 
 export interface LatestOrdersProps {
@@ -34,7 +34,22 @@ export interface LatestOrdersProps {
   sx?: SxProps;
 }
 
-export function LatestOrders({ orders = [], sx }: LatestOrdersProps): React.JSX.Element {
+export function LatestOrders({ sx }: LatestOrdersProps): React.JSX.Element {
+  const [orders, setOrders] = React.useState<Order[]>([]);
+
+  React.useEffect(() => {
+    async function fetchOrders() {
+      try {
+        const response = await axios.get('http://localhost:5000/api/orders');
+        setOrders(response.data);
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
+    }
+
+    fetchOrders();
+  }, []);
+
   return (
     <Card sx={sx}>
       <CardHeader title="Latest orders" />
@@ -51,12 +66,13 @@ export function LatestOrders({ orders = [], sx }: LatestOrdersProps): React.JSX.
           </TableHead>
           <TableBody>
             {orders.map((order) => {
+              // Assuming the status is part of the order, adjust if needed
               const { label, color } = statusMap[order.status] ?? { label: 'Unknown', color: 'default' };
 
               return (
-                <TableRow hover key={order.id}>
-                  <TableCell>{order.id}</TableCell>
-                  <TableCell>{order.customer.name}</TableCell>
+                <TableRow hover key={order._id}>
+                  <TableCell>{order._id}</TableCell>
+                  <TableCell>{order.name}</TableCell>
                   <TableCell>{dayjs(order.createdAt).format('MMM D, YYYY')}</TableCell>
                   <TableCell>
                     <Chip color={color} label={label} size="small" />

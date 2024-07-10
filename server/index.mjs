@@ -12,6 +12,7 @@ import todayRevenueHandler from './api/revenue/today.js';
 import thisMonthOrdersHandler from './api/orders/thisMonth.js';
 import thisWeekOrdersHandler from './api/orders/thisWeek.js';
 import todayOrdersHandler from './api/orders/today.js';
+import ordersHandler from './api/orders.js';
 
 dotenv.config();
 
@@ -44,6 +45,8 @@ app.get('/api/revenue/today', todayRevenueHandler); // Use the handler function
 app.get('/api/orders/thisMonth', thisMonthOrdersHandler); // Use the handler function
 app.get('/api/orders/thisWeek', thisWeekOrdersHandler); // Use the handler function
 app.get('/api/orders/today',todayOrdersHandler); // Use the handler function
+
+app.get('/api/orders', ordersHandler); // Use the handler function;
 
 
 // Start the server

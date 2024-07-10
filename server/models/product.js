@@ -1,4 +1,5 @@
-import mongoose, { Schema, model, models } from 'mongoose';
+import mongoose from 'mongoose';
+const { Schema, model, models } = mongoose;
 
 const ProductSchema = new Schema({
     title: {
@@ -16,14 +17,11 @@ const ProductSchema = new Schema({
         type: [{type:String}] // Array of strings to store image URLs
     }, 
     category: {
-        type:mongoose.Types.ObjectId, 
-        ref:'Category',
+        type: mongoose.Types.ObjectId, 
+        ref: 'Category',
         default: null
     },
     properties: { type: Object },
-    
-
-
 }, {
     timestamps: true, 
 });
