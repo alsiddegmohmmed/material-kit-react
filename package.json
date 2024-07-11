@@ -7,7 +7,7 @@
   "private": false,
   "scripts": {
     "dev": "next dev",
-    "build": "tsc",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
