@@ -5,12 +5,19 @@ import { PlugsConnected as PlugsConnectedIcon } from '@phosphor-icons/react/dist
 import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
 import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
 import { XSquare } from '@phosphor-icons/react/dist/ssr/XSquare';
+import { ShoppingBag } from '@phosphor-icons/react/dist/ssr';
+import { Storefront } from '@phosphor-icons/react/dist/ssr';
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,
   'gear-six': GearSixIcon,
   'plugs-connected': PlugsConnectedIcon,
   'x-square': XSquare,
+  shop: ShoppingBag,
+  categories: Storefront,
+  customers: UsersIcon,
+  integrations: PlugsConnectedIcon,
+  settings: GearSixIcon,
   user: UserIcon,
   users: UsersIcon,
 } as Record<string, Icon>;

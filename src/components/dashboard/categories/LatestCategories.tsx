@@ -44,7 +44,7 @@ export function LatestCategories({ categories = [], sx }: LatestCategoriesProps)
       }}
     >
       <Card>
-        <CardHeader subheader="The information can be edited" title="Profile" />
+        <CardHeader subheader="" title="Categories " />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
@@ -70,7 +70,7 @@ export function LatestCategories({ categories = [], sx }: LatestCategoriesProps)
         </CardContent>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button variant="contained">Save details</Button>
+          <Button variant="contained">Save</Button>
         </CardActions>
       </Card>
     </form>
