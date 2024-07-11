@@ -31,3 +31,5 @@ export default async function categoriesHandler(req, res) {
         res.json({ success: true });
     }
 }
+
+

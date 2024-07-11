@@ -14,7 +14,13 @@ import ListItemText from '@mui/material/ListItemText';
 import type { SxProps } from '@mui/material/styles';
 import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowRight';
 import { DotsThreeVertical as DotsThreeVerticalIcon } from '@phosphor-icons/react/dist/ssr/DotsThreeVertical';
-import dayjs from 'dayjs';
+import CardContent from '@mui/material/CardContent';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import Select from '@mui/material/Select';
+import Grid from '@mui/material/Unstable_Grid2';
 
 export interface Category {
   id: string;
@@ -30,6 +36,47 @@ export interface LatestCategoriesProps {
 
 export function LatestCategories({ categories = [], sx }: LatestCategoriesProps): React.JSX.Element {
   return (
+    <>
+    
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+      }}
+    >
+      <Card>
+        <CardHeader subheader="The information can be edited" title="Profile" />
+        <Divider />
+        <CardContent>
+          <Grid container spacing={3}>
+            <Grid md={6} xs={12}>
+              <FormControl fullWidth required>
+                <InputLabel>Create New Category</InputLabel>
+                <OutlinedInput placeholder='New Category' label="First name" name="firstName" />
+              </FormControl>
+            </Grid>
+           
+            <Grid md={6} xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>State</InputLabel>
+                <Select defaultValue="No Parent Category" label="State" name="state" variant="outlined" placeholder='parent Category'>
+                  {categories.map((category) => (
+                    <MenuItem  key={category.id} value={category.id}>{category.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </CardContent>
+        <Divider />
+        <CardActions sx={{ justifyContent: 'flex-end' }}>
+          <Button variant="contained">Save details</Button>
+        </CardActions>
+      </Card>
+    </form>
+
+
+
     <Card sx={sx}>
       <CardHeader title="Latest Categories" />
       <Divider />
@@ -70,6 +117,7 @@ export function LatestCategories({ categories = [], sx }: LatestCategoriesProps)
         </Button>
       </CardActions>
     </Card>
+    </>
   );
 }
 
