@@ -14,6 +14,7 @@ import thisWeekOrdersHandler from './api/orders/thisWeek.js';
 import todayOrdersHandler from './api/orders/today.js';
 import ordersHandler from './api/orders.js';
 import productsHandler from './api/products.js';
+import categoriesHandler from './api/categories.js';
 
 dotenv.config();
 
@@ -54,6 +55,8 @@ app.get('/api/orders/today', todayOrdersHandler); // Use the handler function
 app.get('/api/orders', ordersHandler); // Use the handler function
 
 app.all('/api/products', productsHandler); // Use the handler function
+
+app.get('/api/categories', categoriesHandler); // Use the handler function
 
 // Start the server
 app.listen(port, () => {

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -16,44 +16,40 @@ import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/Arr
 import { DotsThreeVertical as DotsThreeVerticalIcon } from '@phosphor-icons/react/dist/ssr/DotsThreeVertical';
 import dayjs from 'dayjs';
 
-export interface Product {
+export interface Category {
   id: string;
-  image: string;
   name: string;
+  parent?: { name: string };
   updatedAt: Date;
 }
 
-export interface LatestProductsProps {
-  products?: Product[];
+export interface LatestCategoriesProps {
+  categories?: Category[];
   sx?: SxProps;
 }
 
-export function LatestProducts({ products = [], sx }: LatestProductsProps): React.JSX.Element {
+export function LatestCategories({ categories = [], sx }: LatestCategoriesProps): React.JSX.Element {
   return (
     <Card sx={sx}>
-      <CardHeader title="Latest products" />
+      <CardHeader title="Latest Categories" />
       <Divider />
       <List>
-        {products.map((product, index) => (
-          <ListItem divider={index < products.length - 1} key={product.id}>
+        {categories.map((category, index) => (
+          <ListItem divider={index < categories.length - 1} key={category.id}>
             <ListItemAvatar>
-              {product.image ? (
-                <Box component="img" src={product.image} sx={{ borderRadius: 1, height: '48px', width: '48px' }} />
-              ) : (
-                <Box
-                  sx={{
-                    borderRadius: 1,
-                    backgroundColor: 'var(--mui-palette-neutral-200)',
-                    height: '48px',
-                    width: '48px',
-                  }}
-                />
-              )}
+              <Box
+                sx={{
+                  borderRadius: 1,
+                  backgroundColor: 'var(--mui-palette-neutral-200)',
+                  height: '48px',
+                  width: '48px',
+                }}
+              />
             </ListItemAvatar>
             <ListItemText
-              primary={product.name}
+              primary={category.name}
+              secondary={`Parent: ${category.parent ? category.parent.name : 'None'}`}
               primaryTypographyProps={{ variant: 'subtitle1' }}
-              secondary={`Updated ${dayjs(product.updatedAt).format('MMM D, YYYY')}`}
               secondaryTypographyProps={{ variant: 'body2' }}
             />
             <IconButton edge="end">
@@ -77,30 +73,30 @@ export function LatestProducts({ products = [], sx }: LatestProductsProps): Reac
   );
 }
 
-export const LatestProductsContainer = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+export const LatestCategoriesContainer = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/products');
+        const response = await fetch('http://localhost:5000/api/categories');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        setProducts(data.map((product: any) => ({
-          id: product._id,
-          image: product.images[0] || '',
-          name: product.title,
-          updatedAt: product.updatedAt,
+        setCategories(data.map((category: any) => ({
+          id: category._id,
+          name: category.name,
+          parent: category.parent ? { name: category.parent.name } : null,
+          updatedAt: category.updatedAt,
         })));
       } catch (error) {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching categories:', error);
       }
     };
 
-    fetchProducts();
+    fetchCategories();
   }, []);
 
-  return <LatestProducts products={products} />;
+  return <LatestCategories categories={categories} />;
 };

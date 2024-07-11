@@ -80,3 +80,4 @@ module.exports = {
     '@next/next/no-img-element': 'off', // Temporary disabled
   },
 };
+    
