@@ -46,7 +46,7 @@ export function LatestOrders({ sx }: LatestOrdersProps): React.JSX.Element {
         const response = await axios.get('http://localhost:5000/api/orders');
         setOrders(response.data as Order[]);
       } catch (error) {
-        // console.error('Error fetching orders:', error);
+        console.error('Error fetching orders:', error);
       }
     }
 
@@ -69,7 +69,7 @@ export function LatestOrders({ sx }: LatestOrdersProps): React.JSX.Element {
           </TableHead>
           <TableBody>
             {orders.map((order) => {
-              const { label, color } = statusMap[order.status];
+              const { label, color } = statusMap[order.status] || { label: 'Unknown', color: 'default' };
 
               return (
                 <TableRow hover key={order._id}>
