@@ -86,7 +86,7 @@ export const LatestProductsContainer: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async (): Promise<void> => {
       try {
-        const response = await fetch('http://localhost:5000/api/products');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

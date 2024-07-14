@@ -45,7 +45,7 @@ export function LatestOrders({ sx }: LatestOrdersProps): React.JSX.Element {
   React.useEffect(() => {
     async function fetchOrders() {
       try {
-        const response = await axios.get('http://localhost:5000/api/orders');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`);
         setOrders(response.data as Order[]);
       } catch (error) {
         console.error('Error fetching orders:', error);

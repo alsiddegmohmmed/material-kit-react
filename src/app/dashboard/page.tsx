@@ -33,12 +33,12 @@ const Page: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const thisMonthRevenueResponse = await fetch('http://localhost:5000/api/revenue/thisMonth');
-        const thisWeekRevenueResponse = await fetch('http://localhost:5000/api/revenue/thisWeek');
-        const todayRevenueResponse = await fetch('http://localhost:5000/api/revenue/today');
-        const thisMonthOrdersResponse = await fetch('http://localhost:5000/api/orders/thisMonth');
-        const thisWeekOrdersResponse = await fetch('http://localhost:5000/api/orders/thisWeek');
-        const todaysOrdersResponse = await fetch('http://localhost:5000/api/orders/today');
+        const thisMonthRevenueResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/revenue/thisMonth`);
+        const thisWeekRevenueResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/revenue/thisWeek`);
+        const todayRevenueResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/revenue/today`);
+        const thisMonthOrdersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/thisMonth`);
+        const thisWeekOrdersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/thisWeek`);
+        const todaysOrdersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/today`);
 
         if (!thisMonthRevenueResponse.ok || !thisWeekRevenueResponse.ok || !todayRevenueResponse.ok || !thisMonthOrdersResponse.ok || !thisWeekOrdersResponse.ok || !todaysOrdersResponse.ok) {
           throw new Error('Network response was not ok');
