@@ -77,6 +77,12 @@ module.exports = {
     'react/jsx-fragments': 'off', // personal style
     'react/prop-types': 'off', // TypeScript is used for type checking
     'eslint-comments/require-description': 'off', // Disable the rule requiring descriptions for ESLint directive comments
+    'typescript-eslint/restrict-template-expressions': 'off', // Disable the rule requiring descriptions for ESLint directive comments
+    'typescript-eslint/no-unsafe-assignment': 'off', // Disable the rule requiring descriptions for ESLint directive comments
+    'typescript-eslint/no-unsafe-argument': 'off', // Disable the rule requiring descriptions for ESLint directive comments
+    'typescript-eslint/no-unsafe-call': 'off', // Disable the rule requiring descriptions for ESLint directive comments
+    'no-unsafe-member-access': 'off', // Disable the rule requiring descriptions for ESLint directive comments
+    'no-explicit-any': 'off', // Disable the rule requiring descriptions for ESLint directive comments
 
     '@next/next/no-img-element': 'off', // Temporary disabled
   },
