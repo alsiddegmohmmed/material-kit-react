@@ -128,7 +128,7 @@ export const LatestCategoriesContainer = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
