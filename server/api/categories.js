@@ -1,6 +1,6 @@
-// categoriesapi.js
+// categories.js
 import { mongooseConnect } from "../lib/mongoose.js";
-import Category from "../models/Category.js";
+import Category from "../models/category.js";
 
 
 export default async function categoriesHandler(req, res) {
