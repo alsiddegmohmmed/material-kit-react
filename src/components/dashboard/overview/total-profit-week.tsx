@@ -19,7 +19,7 @@ export function TotalProfitWeek({ value, sx }: TotalProfitProps): React.JSX.Elem
         <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }} spacing={3}>
           <Stack spacing={1}>
             <Typography color="text.secondary" variant="overline">
-             {"THIS WEEK'S ORDERS"}
+             THIS WEEK ORDERS
             </Typography>
             <Typography variant="h4">{value}</Typography>
           </Stack>

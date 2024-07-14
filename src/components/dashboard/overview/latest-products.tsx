@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -28,6 +28,7 @@ export interface LatestProductsProps {
   sx?: SxProps;
 }
 
+// Add explicit return type
 export function LatestProducts({ products = [], sx }: LatestProductsProps): React.JSX.Element {
   return (
     <Card sx={sx}>
@@ -77,18 +78,26 @@ export function LatestProducts({ products = [], sx }: LatestProductsProps): Reac
   );
 }
 
-export const LatestProductsContainer = () => {
+// Add explicit return type
+export const LatestProductsContainer: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchProducts = async (): Promise<void> => {
       try {
         const response = await fetch('http://localhost:5000/api/products');
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        const data = await response.json();
-        setProducts(data.map((product: any) => ({
+        // Define a type for the fetched product data
+        interface FetchedProduct {
+          _id: string;
+          images: string[];
+          title: string;
+          updatedAt: Date;
+        }
+        const data: FetchedProduct[] = await response.json();
+        setProducts(data.map((product) => ({
           id: product._id,
           image: product.images[0] || '',
           name: product.title,
