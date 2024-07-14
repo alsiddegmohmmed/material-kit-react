@@ -4,6 +4,7 @@ const config = {
     ignoreDuringBuilds: true,
   },
   distDir: '.next',
+  basePath: '/dashboard',
 };
 
 module.exports = config;
