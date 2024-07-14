@@ -1,9 +1,11 @@
+
+ 
+/* eslint-disable no-console */
 "use client"
 
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
-import dayjs from 'dayjs';
-import { config } from '@/config';
+
 import { Budget } from '@/components/dashboard/overview/budget';
 import { LatestOrders } from '@/components/dashboard/overview/latest-orders';
 import { LatestProductsContainer } from '@/components/dashboard/overview/latest-products';
@@ -44,12 +46,12 @@ export default function Page(): React.ReactElement {
           throw new Error('Network response was not ok');
         }
 
-        const thisMonthRevenueData: RevenueResponse = await thisMonthRevenueResponse.json();
-        const thisWeekRevenueData: RevenueResponse = await thisWeekRevenueResponse.json();
-        const todayRevenueData: RevenueResponse = await todayRevenueResponse.json();
-        const thisMonthOrdersData: OrdersResponse = await thisMonthOrdersResponse.json();
-        const thisWeekOrdersData: OrdersResponse = await thisWeekOrdersResponse.json();
-        const todaysOrdersData: OrdersResponse = await todaysOrdersResponse.json();
+const thisMonthRevenueData: RevenueResponse = await thisMonthRevenueResponse.json() as RevenueResponse;
+        const thisWeekRevenueData: RevenueResponse = await thisWeekRevenueResponse.json() as RevenueResponse;
+        const todayRevenueData: RevenueResponse = await todayRevenueResponse.json()  as RevenueResponse;
+        const thisMonthOrdersData: OrdersResponse = await thisMonthOrdersResponse.json() as OrdersResponse;
+        const thisWeekOrdersData: OrdersResponse = await thisWeekOrdersResponse.json() as OrdersResponse;
+        const todaysOrdersData: OrdersResponse = await todaysOrdersResponse.json() as OrdersResponse;
 
         setThisMonthRevenue(thisMonthRevenueData.revenue);
         setThisWeekRevenue(thisWeekRevenueData.revenue);
@@ -62,20 +64,20 @@ export default function Page(): React.ReactElement {
       }
     }
 
-    fetchData();
+    fetchData().catch(console.error);
   }, []);
 
   return (
     <Grid container spacing={3}>
       <Grid container item spacing={3}>
         <Grid item lg={4} sm={6} xs={12}>
-          <TotalProfit sx={{ height: '100%' }} value={thisMonthOrders?.toString()} />
+          <TotalProfit sx={{ height: '100%' }} value={thisMonthOrders?.toString() ?? ''} />
         </Grid>
         <Grid item lg={4} sm={6} xs={12}>
-          <TotalProfitWeek sx={{ height: '100%' }} value={thisWeekOrders?.toString()} />
+          <TotalProfitWeek sx={{ height: '100%' }} value={thisWeekOrders?.toString() ?? ''} />
         </Grid>
         <Grid item lg={4} sm={6} xs={12}>
-          <TotalProfitToday sx={{ height: '100%' }} value={todaysOrders?.toString()} />
+          <TotalProfitToday sx={{ height: '100%' }} value={todaysOrders?.toString() ?? ''} />
         </Grid>
       </Grid>
 
@@ -87,7 +89,7 @@ export default function Page(): React.ReactElement {
           <TotalCustomers diff={16} trend="down" sx={{ height: '100%' }} value={`$${thisWeekRevenue?.toFixed(2)}`} />
         </Grid>
         <Grid item lg={4} sm={6} xs={12}>
-          <TasksProgress sx={{ height: '100%' }} value={`$${todayRevenue?.toFixed(2)}`} />
+         <TasksProgress sx={{ height: '100%' }} value={Number(todayRevenue?.toFixed(2))} />
         </Grid>
       </Grid>
       <Grid item lg={8} xs={12}>
@@ -106,7 +108,7 @@ export default function Page(): React.ReactElement {
 
 </Grid>
       <Grid item lg={4} md={6} xl={3} xs={12}>
-        <LatestProductsContainer sx={{ height: '100%' }} />
+        <LatestProductsContainer />
       </Grid>
       <Grid item lg={8} md={12} xl={9} xs={12}>
         <LatestOrders />
