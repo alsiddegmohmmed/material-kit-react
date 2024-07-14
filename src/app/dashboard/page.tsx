@@ -1,9 +1,6 @@
+/* eslint-disable */
 
- 
-/* eslint-disable no-console */
-"use client"
-
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
 
 import { Budget } from '@/components/dashboard/overview/budget';
@@ -24,15 +21,15 @@ interface OrdersResponse {
   count: number;
 }
 
-export default function Page(): React.ReactElement {
-  const [thisMonthRevenue, setThisMonthRevenue] = React.useState<number | null>(null);
-  const [thisWeekRevenue, setThisWeekRevenue] = React.useState<number | null>(null);
-  const [todayRevenue, setTodayRevenue] = React.useState<number | null>(null);
-  const [thisMonthOrders, setThisMonthOrders] = React.useState<number | null>(null);
-  const [thisWeekOrders, setThisWeekOrders] = React.useState<number | null>(null);
-  const [todaysOrders, setTodaysOrders] = React.useState<number | null>(null);
+const Page: React.FC = () => {
+  const [thisMonthRevenue, setThisMonthRevenue] = useState<number | null>(null);
+  const [thisWeekRevenue, setThisWeekRevenue] = useState<number | null>(null);
+  const [todayRevenue, setTodayRevenue] = useState<number | null>(null);
+  const [thisMonthOrders, setThisMonthOrders] = useState<number | null>(null);
+  const [thisWeekOrders, setThisWeekOrders] = useState<number | null>(null);
+  const [todaysOrders, setTodaysOrders] = useState<number | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     async function fetchData() {
       try {
         const thisMonthRevenueResponse = await fetch('http://localhost:5000/api/revenue/thisMonth');
@@ -46,12 +43,12 @@ export default function Page(): React.ReactElement {
           throw new Error('Network response was not ok');
         }
 
-const thisMonthRevenueData: RevenueResponse = await thisMonthRevenueResponse.json() as RevenueResponse;
-        const thisWeekRevenueData: RevenueResponse = await thisWeekRevenueResponse.json() as RevenueResponse;
-        const todayRevenueData: RevenueResponse = await todayRevenueResponse.json()  as RevenueResponse;
-        const thisMonthOrdersData: OrdersResponse = await thisMonthOrdersResponse.json() as OrdersResponse;
-        const thisWeekOrdersData: OrdersResponse = await thisWeekOrdersResponse.json() as OrdersResponse;
-        const todaysOrdersData: OrdersResponse = await todaysOrdersResponse.json() as OrdersResponse;
+        const thisMonthRevenueData: RevenueResponse = await thisMonthRevenueResponse.json();
+        const thisWeekRevenueData: RevenueResponse = await thisWeekRevenueResponse.json();
+        const todayRevenueData: RevenueResponse = await todayRevenueResponse.json();
+        const thisMonthOrdersData: OrdersResponse = await thisMonthOrdersResponse.json();
+        const thisWeekOrdersData: OrdersResponse = await thisWeekOrdersResponse.json();
+        const todaysOrdersData: OrdersResponse = await todaysOrdersResponse.json();
 
         setThisMonthRevenue(thisMonthRevenueData.revenue);
         setThisWeekRevenue(thisWeekRevenueData.revenue);
@@ -64,7 +61,7 @@ const thisMonthRevenueData: RevenueResponse = await thisMonthRevenueResponse.jso
       }
     }
 
-    fetchData().catch(console.error);
+    void fetchData();
   }, []);
 
   return (
@@ -89,24 +86,24 @@ const thisMonthRevenueData: RevenueResponse = await thisMonthRevenueResponse.jso
           <TotalCustomers diff={16} trend="down" sx={{ height: '100%' }} value={`$${thisWeekRevenue?.toFixed(2)}`} />
         </Grid>
         <Grid item lg={4} sm={6} xs={12}>
-         <TasksProgress sx={{ height: '100%' }} value={Number(todayRevenue?.toFixed(2))} />
+          <TasksProgress sx={{ height: '100%' }} value={Number(todayRevenue?.toFixed(2))} />
         </Grid>
       </Grid>
+
       <Grid item lg={8} xs={12}>
-      <Sales
-  chartSeries={[
-    { name: 'This month - Revenue', data: [thisMonthRevenue || 0, 0, 0] },
-    { name: 'This week - Revenue', data: [0, thisWeekRevenue || 0, 0] },
-    { name: 'Today - Revenue', data: [0, 0, todayRevenue || 0] },
-    { name: 'This month - Orders', data: [thisMonthOrders || 0, 0, 0] },
-    { name: 'This week - Orders', data: [0, thisWeekOrders || 0, 0] },
-    { name: 'Today - Orders', data: [0, 0, todaysOrders || 0] },
-  ]}
-  sx={{ height: '100%' }}
-/>
+        <Sales
+          chartSeries={[
+            { name: 'This month - Revenue', data: [thisMonthRevenue || 0, 0, 0] },
+            { name: 'This week - Revenue', data: [0, thisWeekRevenue || 0, 0] },
+            { name: 'Today - Revenue', data: [0, 0, todayRevenue || 0] },
+            { name: 'This month - Orders', data: [thisMonthOrders || 0, 0, 0] },
+            { name: 'This week - Orders', data: [0, thisWeekOrders || 0, 0] },
+            { name: 'Today - Orders', data: [0, 0, todaysOrders || 0] },
+          ]}
+          sx={{ height: '100%' }}
+        />
+      </Grid>
 
-
-</Grid>
       <Grid item lg={4} md={6} xl={3} xs={12}>
         <LatestProductsContainer />
       </Grid>
@@ -115,4 +112,6 @@ const thisMonthRevenueData: RevenueResponse = await thisMonthRevenueResponse.jso
       </Grid>
     </Grid>
   );
-}
+};
+
+export default Page;
