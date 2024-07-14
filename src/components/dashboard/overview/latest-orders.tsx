@@ -16,16 +16,19 @@ import { ArrowRight as ArrowRightIcon } from '@phosphor-icons/react/dist/ssr/Arr
 import dayjs from 'dayjs';
 import axios from 'axios';
 
-const statusMap = {
+type OrderStatus = 'pending' | 'delivered' | 'refunded';
+
+const statusMap: Record<OrderStatus, { label: string; color: 'warning' | 'success' | 'error' }> = {
   pending: { label: 'Pending', color: 'warning' },
   delivered: { label: 'Delivered', color: 'success' },
   refunded: { label: 'Refunded', color: 'error' },
-} as const;
+};
 
 export interface Order {
   _id: string;
   name: string;
   createdAt: Date;
+  status: OrderStatus;
   // Add other fields if necessary
 }
 
@@ -41,13 +44,13 @@ export function LatestOrders({ sx }: LatestOrdersProps): React.JSX.Element {
     async function fetchOrders() {
       try {
         const response = await axios.get('http://localhost:5000/api/orders');
-        setOrders(response.data);
+        setOrders(response.data as Order[]);
       } catch (error) {
-        console.error('Error fetching orders:', error);
+        // console.error('Error fetching orders:', error);
       }
     }
 
-    fetchOrders();
+    fetchOrders().catch(console.error);
   }, []);
 
   return (
@@ -66,8 +69,7 @@ export function LatestOrders({ sx }: LatestOrdersProps): React.JSX.Element {
           </TableHead>
           <TableBody>
             {orders.map((order) => {
-              // Assuming the status is part of the order, adjust if needed
-              const { label, color } = statusMap[order.status] ?? { label: 'Delivered', color: 'success' };
+              const { label, color } = statusMap[order.status];
 
               return (
                 <TableRow hover key={order._id}>
