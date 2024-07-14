@@ -76,8 +76,8 @@ module.exports = {
     'no-redeclare': 'off', // conflict with TypeScript function overloads
     'react/jsx-fragments': 'off', // personal style
     'react/prop-types': 'off', // TypeScript is used for type checking
+    'eslint-comments/require-description': 'off', // Disable the rule requiring descriptions for ESLint directive comments
 
     '@next/next/no-img-element': 'off', // Temporary disabled
   },
 };
-    

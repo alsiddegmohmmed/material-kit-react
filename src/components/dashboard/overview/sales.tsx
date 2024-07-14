@@ -83,7 +83,9 @@ function useChartOptions(): ChartOptions<'line'> {
         callbacks: {
           label: function (context) {
             const label = context.dataset.label || '';
-            return `${label}: ${context.raw}`;
+            // Ensure context.raw is not undefined or null
+            const value = context.raw ?? '';
+            return `${label}: ${value}`;
           },
         },
       },
