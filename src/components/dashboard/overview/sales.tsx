@@ -81,11 +81,11 @@ function useChartOptions(): ChartOptions<'line'> {
       },
       tooltip: {
         callbacks: {
-          label: function (context) {
+          label: (context) => {
             const label = context.dataset.label || '';
             // Ensure context.raw is not undefined or null
-            const value = context.raw ?? '';
-            return `${label}: ${value}`;
+            
+            return `${label}: ${context.raw?.toString() ?? ''}`;
           },
         },
       },
