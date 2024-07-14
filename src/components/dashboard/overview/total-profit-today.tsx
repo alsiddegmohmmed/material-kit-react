@@ -19,7 +19,7 @@ export function TotalProfitToday({ value, sx }: TotalProfitProps): React.JSX.Ele
         <Stack direction="row" sx={{ alignItems: 'flex-start', justifyContent: 'space-between' }} spacing={3}>
           <Stack spacing={1}>
             <Typography color="text.secondary" variant="overline">
-             TODAY'S ORDERS
+             TODAY ORDERS
             </Typography>
             <Typography variant="h4">{value}</Typography>
           </Stack>
