@@ -1,4 +1,5 @@
-"use client"
+'use client';
+/* eslint-disable */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
@@ -17,6 +18,8 @@ import Stack from '@mui/material/Stack';
 interface Category {
   id: string;
   name: string;
+  parent?: { name: string };
+  updatedAt: Date;
 }
 
 export function ProductForm(): React.JSX.Element {
@@ -27,12 +30,19 @@ export function ProductForm(): React.JSX.Element {
   const [price, setPrice] = useState('');
 
   useEffect(() => {
-    // Fetch categories from the API
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
         const data = await response.json();
-        setCategories(data);
+        setCategories(data.map((category: any) => ({
+          id: category._id,
+          name: category.name,
+          parent: category.parent ? { name: category.parent.name } : null,
+          updatedAt: category.updatedAt,
+        })));
       } catch (error) {
         console.error('Error fetching categories:', error);
       }
@@ -41,9 +51,41 @@ export function ProductForm(): React.JSX.Element {
     fetchCategories();
   }, []);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Handle form submission
+
+    const productData = {
+      title: productName,
+      category,
+      description,
+      price: parseFloat(price),
+    };
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save product');
+      }
+
+      const result = await response.json();
+      console.log('Product saved successfully:', result);
+
+      // Reset form fields after successful submission
+      setProductName('');
+      setCategory('');
+      setDescription('');
+      setPrice('');
+
+    } catch (error) {
+      console.error('Error saving product:', error);
+    }
   };
 
   return (
