@@ -18,9 +18,7 @@ import categoriesHandler from './api/categories.js';
 
 dotenv.config();
 
-console.log("Loaded environment variables:");
-console.log(process.env); // Log all environment variables
-console.log("MONGODB_URI:", process.env.MONGODB_URI); // Log the specific variable
+
 
 const app = express();
 const port = process.env.PORT || 5000;

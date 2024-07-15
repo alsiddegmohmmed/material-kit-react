@@ -25,7 +25,7 @@ export default function page() {
                 </Stack>
             </Stack>
                 <div>
-                <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained">
+                <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" href='/dashboard/products/new'>
                     Add
                 </Button>
                 </div>

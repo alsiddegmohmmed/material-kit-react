@@ -10,7 +10,9 @@ export const paths = {
     products: '/dashboard/products', 
     orders: '/dashboard/orders',
     categories: '/dashboard/categories',
-    test: '/dashboard/test'
+    test: '/dashboard/test',
+    newproduct: '/dashboard/products/new',
+    editproduct: '/dashboard/products/edit'
   },
   errors: { notFound: '/errors/not-found' },
 } as const;
