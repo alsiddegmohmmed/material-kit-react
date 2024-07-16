@@ -1,11 +1,7 @@
-// server/index.mjs
-
 import express from 'express';
 import cors from 'cors';
-import dayjs from 'dayjs';
-import { mongooseConnect } from './lib/mongoose.js'; // Adjusted import path
-import Order from './models/order.js'; // Adjusted import path
 import dotenv from 'dotenv';
+import { mongooseConnect } from './lib/mongoose.js'; // Adjusted import path
 import thisMonthRevenueHandler from './api/revenue/thisMonth.js';
 import thisWeekRevenueHandler from './api/revenue/thisWeek.js';
 import todayRevenueHandler from './api/revenue/today.js';
@@ -15,6 +11,7 @@ import todayOrdersHandler from './api/orders/today.js';
 import ordersHandler from './api/orders.js';
 import productsHandler from './api/products.js';
 import categoriesHandler from './api/categories.js';
+import uploadHandler from './api/upload.js'; // Import the upload handler
 
 dotenv.config();
 
@@ -57,6 +54,9 @@ app.get('/api/orders', ordersHandler); // Use the handler function
 app.all('/api/products', productsHandler); // Use the handler function
 
 app.get('/api/categories', categoriesHandler); // Use the handler function
+
+// API endpoint for image uploads
+app.post('/api/upload', uploadHandler); // Add the endpoint for uploads
 
 // Start the server
 app.listen(port, () => {

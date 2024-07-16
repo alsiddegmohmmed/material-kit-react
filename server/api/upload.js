@@ -1,8 +1,8 @@
 import multiparty from 'multiparty';
 import cloudinary from 'cloudinary';
 import fs from 'fs';
-import { mongooseConnect } from '@/lib/mongoose';
-import { isAdminRequest } from './auth/[...nextauth]';
+import { mongooseConnect } from '../lib/mongoose.js';
+
 
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
