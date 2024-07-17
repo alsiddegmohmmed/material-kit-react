@@ -29,7 +29,6 @@ import Grid from '@mui/material/Unstable_Grid2';
 interface Category {
   _id: string;
   properties: never[];
-  id: string;
   name: string;
   parent?: { name: string };
   updatedAt: Date;
@@ -39,6 +38,8 @@ export interface LatestCategoriesProps {
   categories?: Category[];
   sx?: SxProps;
 }
+
+
 
 export function LatestCategories({ sx }: LatestCategoriesProps) {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -56,9 +57,10 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
         }
         const data: Category[] = await response.json();
         setCategories(data.map((category: Category) => ({
-          id: category._id,
+          _id: category._id,
           name: category.name,
-          parent: category.parent ? { name: category.parent.name } : null,
+          parent: category.parent ? { name: category.parent.name } : undefined,
+          properties: category.properties,
           updatedAt: category.updatedAt,
         })));
       } catch (error) {
@@ -68,18 +70,19 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
   
     fetchCategories();
   }, []);
+  
 
   const handleSaveCategory = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const data = {
       name,
-      parent: parentCategory || null,
+      parent: parentCategory, // No need for parentCategory || null
       properties: properties.map(p => ({ name: p.name, values: p.values.split(',') })),
     };
   
     try {
       if (editedCategory) {
-        data._id = editedCategory.id;
+        data._id = editedCategory._id;  // Use _id instead of id
         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
           method: 'PUT',
           headers: {
@@ -88,7 +91,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
           body: JSON.stringify(data),
         });
         setEditedCategory(null);
-        setCategories(categories.map(cat => cat.id === editedCategory.id ? { ...cat, name: data.name, parent: categories.find(c => c.id === data.parent) } : cat));
+        setCategories(categories.map(cat => cat._id === editedCategory._id ? { ...cat, name: data.name, parent: categories.find(c => c._id === data.parent) } : cat));
       } else {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
           method: 'POST',
@@ -98,23 +101,24 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
           body: JSON.stringify(data),
         });
         const result = await response.json();
-        setCategories([...categories, { ...result, parent: categories.find(c => c.id === result.parent) }]);
+        setCategories([...categories, { ...result, parent: categories.find(c => c._id === result.parent) }]);
       }
     } catch (error) {
       console.error('Error saving category:', error);
     }
     setName('');
-    setParentCategory(null);
+    setParentCategory('');
     setProperties([]);
   };
-
+  
+  
   const handleEditCategory = (category: Category) => {
     setEditedCategory(category);
     setName(category.name);
-    setParentCategory(category.parent?.name || null);
+    setParentCategory(category.parent ? category.parent._id : ''); // Ensure parentCategory is set correctly
     setProperties(category.properties || []);
   };
-
+  
  
 const handleDeleteCategory = async (categoryId: string) => {
   try {
@@ -153,24 +157,25 @@ const handleDeleteCategory = async (categoryId: string) => {
                     placeholder="Category name"
                     label="Category name"
                     value={name}
-                    onChange={(event) => setName(event.target.value)}
+                    onChange={(event) => {
+                      setName(event.target.value)}}
                   />
                 </FormControl>
               </Grid>
               <Grid md={6} xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Parent Category</InputLabel>
-                  <Select
-                    label="Parent Category"
-                    value={parentCategory}
-                    onChange={(event) => setParentCategory(event.target.value)}
-                  >
-                    <MenuItem value="">No Parent Category</MenuItem>
-                    {categories.map((category) => (
-                      <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+              <FormControl fullWidth>
+                <InputLabel>Parent Category</InputLabel>
+                <Select
+                  label="Parent Category"
+                  value={parentCategory || ''} // Ensure empty string if parentCategory is null
+                  onChange={(event) => setParentCategory(event.target.value)}
+                >
+                  <MenuItem value="">No Parent Category</MenuItem>
+                  {categories.map((category) => (
+                    <MenuItem key={category._id} value={category._id}>{category.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               </Grid>
             </Grid>
           </CardContent>
@@ -199,35 +204,33 @@ const handleDeleteCategory = async (categoryId: string) => {
         <CardHeader title="Latest Categories" />
         <Divider />
         <List>
-          {categories.map((category, index) => (
-            <ListItem divider={index < categories.length - 1} key={category.id}>
-              <ListItemAvatar>
-                <Box
-                  sx={{
-                    borderRadius: 1,
-                    backgroundColor: 'var(--mui-palette-neutral-200)',
-                    height: '48px',
-                    width: '48px',
-                  }}
-                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={category.name}
-                secondary={`Parent: ${category.parent ? category.parent.name : 'None'}`}
-                primaryTypographyProps={{ variant: 'subtitle1' }}
-                secondaryTypographyProps={{ variant: 'body2' }}
-              />
-              <button>
-                test
-              </button>
-              <IconButton edge="end" onClick={() => handleEditCategory(category)}>
-                <DotsThreeVerticalIcon weight="bold" />
-              </IconButton>
-              <IconButton edge="end" onClick={() => handleDeleteCategory(category.id)}>
-            
-              </IconButton>
-            </ListItem>
-          ))}
+        {categories.map((category, index) => (
+  <ListItem divider={index < categories.length - 1} key={category._id}>
+    <ListItemAvatar>
+      <Box
+        sx={{
+          borderRadius: 1,
+          backgroundColor: 'var(--mui-palette-neutral-200)',
+          height: '48px',
+          width: '48px',
+        }}
+      />
+    </ListItemAvatar>
+    <ListItemText
+      primary={category.name}
+      secondary={`Parent: ${category.parent ? category.parent.name : 'None'}`}
+      primaryTypographyProps={{ variant: 'subtitle1' }}
+      secondaryTypographyProps={{ variant: 'body2' }}
+    />
+    <IconButton edge="end" onClick={() => handleEditCategory(category)}>
+      <DotsThreeVerticalIcon weight="bold" />
+    </IconButton>
+    <IconButton edge="end" onClick={() => handleDeleteCategory(category._id)}>
+    </IconButton>
+  </ListItem>
+))}
+  
+
         </List>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
