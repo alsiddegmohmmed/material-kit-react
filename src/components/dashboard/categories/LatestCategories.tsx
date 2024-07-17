@@ -1,4 +1,4 @@
-/* eslint-disable */
+
 "use client";
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
@@ -26,7 +26,9 @@ import Grid from '@mui/material/Unstable_Grid2';
 
 
 
-export interface Category {
+interface Category {
+  _id: string;
+  properties: never[];
   id: string;
   name: string;
   parent?: { name: string };
@@ -38,7 +40,7 @@ export interface LatestCategoriesProps {
   sx?: SxProps;
 }
 
-export const LatestCategories = ({ sx }: LatestCategoriesProps) => {
+export function LatestCategories({ sx }: LatestCategoriesProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState('');
   const [parentCategory, setParentCategory] = useState<string | null>(null);
@@ -52,8 +54,8 @@ export const LatestCategories = ({ sx }: LatestCategoriesProps) => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        const data = await response.json();
-        setCategories(data.map((category: any) => ({
+        const data: Category[] = await response.json() as Category[];
+        setCategories(data.map((category: Category) => ({
           id: category._id,
           name: category.name,
           parent: category.parent ? { name: category.parent.name } : null,
@@ -63,21 +65,21 @@ export const LatestCategories = ({ sx }: LatestCategoriesProps) => {
         console.error('Error fetching categories:', error);
       }
     };
-
+  
     fetchCategories();
   }, []);
 
-  const handleSaveCategory = async (event: React.FormEvent) => {
+  const handleSaveCategory = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const data = {
       name,
       parent: parentCategory || null,
       properties: properties.map(p => ({ name: p.name, values: p.values.split(',') })),
     };
-
+  
     try {
       if (editedCategory) {
-        data.id = editedCategory.id;
+        data._id = editedCategory.id;
         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
           method: 'PUT',
           headers: {
@@ -113,14 +115,15 @@ export const LatestCategories = ({ sx }: LatestCategoriesProps) => {
     setProperties(category.properties || []);
   };
 
-  const handleDeleteCategory = async (categoryId: string) => {
-    try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories?_id=${categoryId}`, { method: 'DELETE' });
-      setCategories(categories.filter(category => category.id !== categoryId));
-    } catch (error) {
-      console.error('Error deleting category:', error);
-    }
-  };
+ 
+const handleDeleteCategory = async (categoryId: string) => {
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories?_id=${categoryId}`, { method: 'DELETE' });
+    setCategories(categories.filter(category => category.id !== categoryId));
+  } catch (error) {
+    console.error('Error deleting category:', error);
+  }
+};
 
   const addProperty = () => {
     setProperties([...properties, { name: '', values: '' }]);
@@ -214,6 +217,9 @@ export const LatestCategories = ({ sx }: LatestCategoriesProps) => {
                 primaryTypographyProps={{ variant: 'subtitle1' }}
                 secondaryTypographyProps={{ variant: 'body2' }}
               />
+              <button>
+                test
+              </button>
               <IconButton edge="end" onClick={() => handleEditCategory(category)}>
                 <DotsThreeVerticalIcon weight="bold" />
               </IconButton>
@@ -232,4 +238,4 @@ export const LatestCategories = ({ sx }: LatestCategoriesProps) => {
       </Card>
     </>
   );
-};
+}

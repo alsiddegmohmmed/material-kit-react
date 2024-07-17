@@ -52,6 +52,8 @@ app.get('/api/orders/today', todayOrdersHandler); // Use the handler function
 app.get('/api/orders', ordersHandler); // Use the handler function
 
 app.all('/api/products', productsHandler); // Use the handler function
+app.all('/api/categories', categoriesHandler); // Ensure all methods are handled
+
 
 app.get('/api/categories', categoriesHandler); // Use the handler function
 
