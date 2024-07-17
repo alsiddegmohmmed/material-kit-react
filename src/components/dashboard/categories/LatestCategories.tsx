@@ -54,7 +54,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        const data: Category[] = await response.json() as Category[];
+        const data: Category[] = await response.json();
         setCategories(data.map((category: Category) => ({
           id: category._id,
           name: category.name,
