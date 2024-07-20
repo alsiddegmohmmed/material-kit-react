@@ -14,49 +14,33 @@ import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { TotalProfitWeek } from '@/components/dashboard/overview/total-profit-week';
 import { TotalProfitToday } from '@/components/dashboard/overview/total-profit-today';
 
-interface RevenueResponse {
-  revenue: number;
-}
-
-interface OrdersResponse {
-  count: number;
+interface DashboardData {
+  orders: {
+    month: number;
+    week: number;
+    day: number;
+  };
+  revenue: {
+    month: number;
+    week: number;
+    day: number;
+  };
 }
 
 const Page: React.FC = () => {
-  const [thisMonthRevenue, setThisMonthRevenue] = useState<number | null>(null);
-  const [thisWeekRevenue, setThisWeekRevenue] = useState<number | null>(null);
-  const [todayRevenue, setTodayRevenue] = useState<number | null>(null);
-  const [thisMonthOrders, setThisMonthOrders] = useState<number | null>(null);
-  const [thisWeekOrders, setThisWeekOrders] = useState<number | null>(null);
-  const [todaysOrders, setTodaysOrders] = useState<number | null>(null);
+  const [data, setData] = useState<DashboardData | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const thisMonthRevenueResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/revenue/thisMonth`);
-        const thisWeekRevenueResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/revenue/thisWeek`);
-        const todayRevenueResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/revenue/today`);
-        const thisMonthOrdersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/thisMonth`);
-        const thisWeekOrdersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/thisWeek`);
-        const todaysOrdersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/today`);
-
-        if (!thisMonthRevenueResponse.ok || !thisWeekRevenueResponse.ok || !todayRevenueResponse.ok || !thisMonthOrdersResponse.ok || !thisWeekOrdersResponse.ok || !todaysOrdersResponse.ok) {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/dashboard`);
+        
+        if (!response.ok) {
           throw new Error('Network response was not ok');
         }
 
-        const thisMonthRevenueData: RevenueResponse = await thisMonthRevenueResponse.json();
-        const thisWeekRevenueData: RevenueResponse = await thisWeekRevenueResponse.json();
-        const todayRevenueData: RevenueResponse = await todayRevenueResponse.json();
-        const thisMonthOrdersData: OrdersResponse = await thisMonthOrdersResponse.json();
-        const thisWeekOrdersData: OrdersResponse = await thisWeekOrdersResponse.json();
-        const todaysOrdersData: OrdersResponse = await todaysOrdersResponse.json();
-
-        setThisMonthRevenue(thisMonthRevenueData.revenue);
-        setThisWeekRevenue(thisWeekRevenueData.revenue);
-        setTodayRevenue(todayRevenueData.revenue);
-        setThisMonthOrders(thisMonthOrdersData.count);
-        setThisWeekOrders(thisWeekOrdersData.count);
-        setTodaysOrders(todaysOrdersData.count);
+        const data: DashboardData = await response.json();
+        setData(data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -65,41 +49,45 @@ const Page: React.FC = () => {
     void fetchData();
   }, []);
 
+  if (!data) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Grid container spacing={3}>
       <Grid container item spacing={3}>
         <Grid item lg={4} sm={6} xs={12}>
-          <TotalProfit sx={{ height: '100%' }} value={thisMonthOrders?.toString() ?? ''} />
+          <TotalProfit sx={{ height: '100%' }} value={data.orders.month.toString()} />
         </Grid>
         <Grid item lg={4} sm={6} xs={12}>
-          <TotalProfitWeek sx={{ height: '100%' }} value={thisWeekOrders?.toString() ?? ''} />
+          <TotalProfitWeek sx={{ height: '100%' }} value={data.orders.week.toString()} />
         </Grid>
         <Grid item lg={4} sm={6} xs={12}>
-          <TotalProfitToday sx={{ height: '100%' }} value={todaysOrders?.toString() ?? ''} />
+          <TotalProfitToday sx={{ height: '100%' }} value={data.orders.day.toString()} />
         </Grid>
       </Grid>
 
       <Grid container item spacing={3}>
         <Grid item lg={4} sm={6} xs={12}>
-          <Budget diff={12} trend="up" sx={{ height: '100%' }} value={`$${thisMonthRevenue?.toFixed(2)}`} />
+          <Budget diff={12} trend="up" sx={{ height: '100%' }} value={`$${data.revenue.month.toFixed(2)}`} />
         </Grid>
         <Grid item lg={4} sm={6} xs={12}>
-          <TotalCustomers diff={16} trend="down" sx={{ height: '100%' }} value={`$${thisWeekRevenue?.toFixed(2)}`} />
+          <TotalCustomers diff={16} trend="down" sx={{ height: '100%' }} value={`$${data.revenue.week.toFixed(2)}`} />
         </Grid>
         <Grid item lg={4} sm={6} xs={12}>
-          <TasksProgress sx={{ height: '100%' }} value={Number(todayRevenue?.toFixed(2))} />
+          <TasksProgress sx={{ height: '100%' }} value={Number(data.revenue.day.toFixed(2))} />
         </Grid>
       </Grid>
 
       <Grid item lg={8} xs={12}>
         <Sales
           chartSeries={[
-            { name: 'This month - Revenue', data: [thisMonthRevenue || 0, 0, 0] },
-            { name: 'This week - Revenue', data: [0, thisWeekRevenue || 0, 0] },
-            { name: 'Today - Revenue', data: [0, 0, todayRevenue || 0] },
-            { name: 'This month - Orders', data: [thisMonthOrders || 0, 0, 0] },
-            { name: 'This week - Orders', data: [0, thisWeekOrders || 0, 0] },
-            { name: 'Today - Orders', data: [0, 0, todaysOrders || 0] },
+            { name: 'This month - Revenue', data: [data.revenue.month, 0, 0] },
+            { name: 'This week - Revenue', data: [0, data.revenue.week, 0] },
+            { name: 'Today - Revenue', data: [0, 0, data.revenue.day] },
+            { name: 'This month - Orders', data: [data.orders.month, 0, 0] },
+            { name: 'This week - Orders', data: [0, data.orders.week, 0] },
+            { name: 'Today - Orders', data: [0, 0, data.orders.day] },
           ]}
           sx={{ height: '100%' }}
         />

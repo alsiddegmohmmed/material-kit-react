@@ -109,6 +109,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
     setName('');
     setParentCategory('');
     setProperties([]);
+    
   };
   
   
@@ -226,6 +227,7 @@ const handleDeleteCategory = async (categoryId: string) => {
       <DotsThreeVerticalIcon weight="bold" />
     </IconButton>
     <IconButton edge="end" onClick={() => handleDeleteCategory(category._id)}>
+      test
     </IconButton>
   </ListItem>
 ))}

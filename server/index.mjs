@@ -12,6 +12,7 @@ import ordersHandler from './api/orders.js';
 import productsHandler from './api/products.js';
 import categoriesHandler from './api/categories.js';
 import uploadHandler from './api/upload.js'; // Import the upload handler
+import dashboardHanderler from './api/dashboard.js';
 
 dotenv.config();
 
@@ -42,12 +43,7 @@ app.get('/', (req, res) => {
 });
 
 // API endpoint for current month's revenue
-app.get('/api/revenue/thisMonth', thisMonthRevenueHandler); // Use the handler function
-app.get('/api/revenue/thisWeek', thisWeekRevenueHandler); // Use the handler function
-app.get('/api/revenue/today', todayRevenueHandler); // Use the handler function
-app.get('/api/orders/thisMonth', thisMonthOrdersHandler); // Use the handler function
-app.get('/api/orders/thisWeek', thisWeekOrdersHandler); // Use the handler function
-app.get('/api/orders/today', todayOrdersHandler); // Use the handler function
+app.get('/api/dashboard', dashboardHanderler); // Use the handler function
 
 app.get('/api/orders', ordersHandler); // Use the handler function
 
