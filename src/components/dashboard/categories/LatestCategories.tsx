@@ -22,6 +22,15 @@ import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Select from '@mui/material/Select';
 import Grid from '@mui/material/Unstable_Grid2';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
+
+
 
 
 
@@ -47,6 +56,9 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
   const [parentCategory, setParentCategory] = useState<string | null>(null);
   const [properties, setProperties] = useState<{ name: string; values: string }[]>([]);
   const [editedCategory, setEditedCategory] = useState<Category | null>(null);
+  const [open, setOpen] = useState(false);
+const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null);
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -121,14 +133,40 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
   };
   
  
-const handleDeleteCategory = async (categoryId: string) => {
-  try {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories?_id=${categoryId}`, { method: 'DELETE' });
-    setCategories(categories.filter(category => category.id !== categoryId));
-  } catch (error) {
-    console.error('Error deleting category:', error);
+  const handleDeleteCategory = async (categoryId: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories?_id=${categoryId}`, { 
+        method: 'DELETE' 
+      });
+  
+      if (response.ok) {
+        setCategories(categories.filter(category => category._id !== categoryId));
+      } else {
+        console.error('Error deleting category:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error deleting category:', error);
+    }
+  };
+  
+
+const handleClickOpen = (categoryId: string) => {
+  setCategoryIdToDelete(categoryId);
+  setOpen(true);
+};
+
+const handleClose = () => {
+  setOpen(false);
+};
+
+const handleConfirmDelete = async () => {
+  if (categoryIdToDelete) {
+    await handleDeleteCategory(categoryIdToDelete);
+    setOpen(false);
   }
 };
+
+
 
   const addProperty = () => {
     setProperties([...properties, { name: '', values: '' }]);
@@ -226,9 +264,10 @@ const handleDeleteCategory = async (categoryId: string) => {
     <IconButton edge="end" onClick={() => handleEditCategory(category)}>
       <DotsThreeVerticalIcon weight="bold" />
     </IconButton>
-    <IconButton edge="end" onClick={() => handleDeleteCategory(category._id)}>
-      test
+    <IconButton edge="end" onClick={() => handleClickOpen(category._id)}>
+      <DeleteIcon color="error" /> 
     </IconButton>
+
   </ListItem>
 ))}
   
@@ -241,6 +280,27 @@ const handleDeleteCategory = async (categoryId: string) => {
           </Button>
         </CardActions>
       </Card>
+      <Dialog
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Are you sure you want to delete this category? This action cannot be undone.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color="primary">
+                Cancel
+              </Button>
+              <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+                Delete
+              </Button>
+            </DialogActions>
+          </Dialog>
     </>
   );
 }
