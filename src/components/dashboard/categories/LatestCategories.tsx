@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
@@ -29,20 +28,13 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-
-
-
-
-
-
 interface Category {
   _id?: string;
-  properties: never[];
+  properties: { name: string; values: string[] }[];
   name: string;
-  parent?: { name: string };
+  parent?: { _id: string; name: string };
   updatedAt: Date;
 }
-
 export interface LatestCategoriesProps {
   categories?: Category[];
   sx?: SxProps;
@@ -56,7 +48,6 @@ interface CategoryResponse {
   updatedAt: Date;
 }
 
-
 export function LatestCategories({ sx }: LatestCategoriesProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState('');
@@ -64,8 +55,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
   const [properties, setProperties] = useState<{ name: string; values: string }[]>([]);
   const [editedCategory, setEditedCategory] = useState<Category | null>(null);
   const [open, setOpen] = useState(false);
-const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null);
-
+  const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -74,11 +64,11 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        const data: Category[] = await response.json() as Category[];
-        setCategories(data.map((category: Category) => ({
+        const data: CategoryResponse[] = await response.json();
+        setCategories(data.map((category: CategoryResponse) => ({
           _id: category._id,
           name: category.name,
-          parent: category.parent ? { name: category.parent.name } : undefined,
+          parent: category.parent ? { _id: category.parent._id, name: category.parent.name } : undefined,
           properties: category.properties,
           updatedAt: category.updatedAt,
         })));
@@ -86,19 +76,18 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
         // console.error('Error fetching categories:', error);
       }
     };
-  
+
     void fetchCategories();
   }, []);
-  
 
   const handleSaveCategory = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const baseData = {
       name,
-      parent: parentCategory, // No need for parentCategory || null
+      parent: parentCategory ? { _id: parentCategory, name: categories.find(cat => cat._id === parentCategory)?.name || '' } : undefined,
       properties: properties.map(p => ({ name: p.name, values: p.values.split(',') })),
     };
-  
+
     try {
       if (editedCategory) {
         const data: typeof baseData & { _id: string } = {
@@ -113,8 +102,8 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
           body: JSON.stringify(data),
         });
         setEditedCategory(null);
-        setCategories(categories.map(cat => cat._id === editedCategory._id ? { ...cat, name: data.name, parent: categories.find(c => c._id === data.parent) } : cat));
-      } else {
+        setCategories(categories.map(cat => cat._id === editedCategory._id ? { ...cat, ...data, properties } : cat));     
+       } else {
         const data: typeof baseData = baseData;
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
           method: 'POST',
@@ -123,32 +112,30 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
           },
           body: JSON.stringify(data),
         });
-        const result: CategoryResponse = await response.json() as CategoryResponse;
-        setCategories([...categories, { ...result, parent: categories.find(c => c._id === result.parent) }]);
+        const result: CategoryResponse = await response.json();
+        setCategories([...categories, { ...result, parent: result.parent ? { _id: result.parent._id, name: result.parent.name } : undefined }]);
       }
     } catch (error) {
       // console.error('Error saving category:', error);
     }
     setName('');
-    setParentCategory('');
+    setParentCategory(null);
     setProperties([]);
   };
-  
-  
+
   const handleEditCategory = (category: Category) => {
     setEditedCategory(category);
     setName(category.name);
-    setParentCategory(category.parent ? category.parent._id : undefined);
-    setProperties(category.properties || []);
+    setParentCategory(category.parent ? category.parent._id : null);
+    setProperties(category.properties.map(p => ({ name: p.name, values: p.values.join(',') })));
   };
-  
- 
+
   const handleDeleteCategory = async (categoryId: string) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories?_id=${categoryId}`, { 
         method: 'DELETE' 
       });
-  
+
       if (response.ok) {
         setCategories(categories.filter(category => category._id !== categoryId));
       } else {
@@ -158,38 +145,22 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
       // console.error('Error deleting category:', error);
     }
   };
-  
 
-const handleClickOpen = (categoryId: string) => {
-  setCategoryIdToDelete(categoryId);
-  setOpen(true);
-};
+  const handleClickOpen = (categoryId: string) => {
+    setCategoryIdToDelete(categoryId);
+    setOpen(true);
+  };
 
-const handleClose = () => {
-  setOpen(false);
-};
-
-const handleConfirmDelete = async () => {
-  if (categoryIdToDelete) {
-    await handleDeleteCategory(categoryIdToDelete);
+  const handleClose = () => {
     setOpen(false);
-  }
-};
+  };
 
-
-
-  // const addProperty = () => {
-  //   setProperties([...properties, { name: '', values: '' }]);
-  // };
-
-  // const handlePropertyChange = (index: number, key: string, value: string) => {
-  //   const updatedProperties = properties.map((property, i) => i === index ? { ...property, [key]: value } : property);
-  //   setProperties(updatedProperties);
-  // };
-
-  // const removeProperty = (index: number) => {
-  //   setProperties(properties.filter((_, i) => i !== index));
-  // };
+  const handleConfirmDelete = async () => {
+    if (categoryIdToDelete) {
+      await handleDeleteCategory(categoryIdToDelete);
+      setOpen(false);
+    }
+  };
 
   return (
     <>
@@ -212,25 +183,26 @@ const handleConfirmDelete = async () => {
                 </FormControl>
               </Grid>
               <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Parent Category</InputLabel>
-                <Select
-                  label="Parent Category"
-                  value={parentCategory || ''} // Ensure empty string if parentCategory is null
-                  onChange={(event) => { setParentCategory(event.target.value); }}
-                >
-                  <MenuItem value="">No Parent Category</MenuItem>
-                  {categories.map((category) => (
-                    <MenuItem key={category._id} value={category._id}>{category.name}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel>Parent Category</InputLabel>
+                  <Select
+                    label="Parent Category"
+                    value={parentCategory || ''} // Ensure empty string if parentCategory is null
+                    onChange={(event) => { setParentCategory(event.target.value); }}
+                  >
+                    <MenuItem value="">No Parent Category</MenuItem>
+                    {categories.map((category) => (
+                      <MenuItem key={category._id} value={category._id}>{category.name}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
             </Grid>
           </CardContent>
           <Divider />
           <CardActions sx={{ justifyContent: 'flex-end' }}>
-            {editedCategory ? <Button
+            {editedCategory ? (
+              <Button
                 variant="outlined"
                 onClick={() => {
                   setEditedCategory(null);
@@ -240,7 +212,8 @@ const handleConfirmDelete = async () => {
                 }}
               >
                 Cancel
-              </Button> : null}
+              </Button>
+            ) : null}
             <Button variant="contained" type="submit">
               Save
             </Button>
@@ -251,35 +224,32 @@ const handleConfirmDelete = async () => {
         <CardHeader title="Latest Categories" />
         <Divider />
         <List>
-        {categories.map((category, index) => (
-  <ListItem divider={index < categories.length - 1} key={category._id}>
-    <ListItemAvatar>
-      <Box
-        sx={{
-          borderRadius: 1,
-          backgroundColor: 'var(--mui-palette-neutral-200)',
-          height: '48px',
-          width: '48px',
-        }}
-      />
-    </ListItemAvatar>
-    <ListItemText
-      primary={category.name}
-      secondary={`Parent: ${category.parent ? category.parent.name : 'None'}`}
-      primaryTypographyProps={{ variant: 'subtitle1' }}
-      secondaryTypographyProps={{ variant: 'body2' }}
-    />
-    <IconButton edge="end" onClick={() => { handleEditCategory(category); }}>
-      <DotsThreeVerticalIcon weight="bold" />
-    </IconButton>
-    <IconButton edge="end" onClick={() => { category._id && handleClickOpen(category._id); }}>
-      <DeleteIcon color="error" /> 
-    </IconButton>
-
-  </ListItem>
-))}
-  
-
+          {categories.map((category, index) => (
+            <ListItem divider={index < categories.length - 1} key={category._id}>
+              <ListItemAvatar>
+                <Box
+                  sx={{
+                    borderRadius: 1,
+                    backgroundColor: 'var(--mui-palette-neutral-200)',
+                    height: '48px',
+                    width: '48px',
+                  }}
+                />
+              </ListItemAvatar>
+              <ListItemText
+                primary={category.name}
+                secondary={`Parent: ${category.parent ? category.parent.name : 'None'}`}
+                primaryTypographyProps={{ variant: 'subtitle1' }}
+                secondaryTypographyProps={{ variant: 'body2' }}
+              />
+              <IconButton edge="end" onClick={() => { handleEditCategory(category); }}>
+                <DotsThreeVerticalIcon weight="bold" />
+              </IconButton>
+              <IconButton edge="end" onClick={() => { category._id && handleClickOpen(category._id); }}>
+                <DeleteIcon color="error" /> 
+              </IconButton>
+            </ListItem>
+          ))}
         </List>
         <Divider />
         <CardActions sx={{ justifyContent: 'flex-end' }}>
@@ -289,26 +259,26 @@ const handleConfirmDelete = async () => {
         </CardActions>
       </Card>
       <Dialog
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle id="alert-dialog-title">Confirm Deletion</DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-description">
-                Are you sure you want to delete this category? This action cannot be undone.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleClose} color="primary">
-                Cancel
-              </Button>
-              <Button onClick={handleConfirmDelete} color="primary">
-                Delete
-              </Button>
-            </DialogActions>
-          </Dialog>
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this category? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="primary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
