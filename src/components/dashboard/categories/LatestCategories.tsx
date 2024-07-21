@@ -36,7 +36,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 
 interface Category {
-  _id: string;
+  _id?: string;
   properties: never[];
   name: string;
   parent?: { name: string };
@@ -51,7 +51,7 @@ export interface LatestCategoriesProps {
 interface CategoryResponse {
   _id: string;
   name: string;
-  parent?: { name: string };
+  parent?: { _id: string; name: string };
   properties: never[];
   updatedAt: Date;
 }
@@ -93,7 +93,7 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
 
   const handleSaveCategory = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    const data = {
+    const baseData = {
       name,
       parent: parentCategory, // No need for parentCategory || null
       properties: properties.map(p => ({ name: p.name, values: p.values.split(',') })),
@@ -101,7 +101,10 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
   
     try {
       if (editedCategory) {
-        data._id = editedCategory._id;  // Use _id instead of id
+        const data: typeof baseData & { _id: string } = {
+          ...baseData,
+          _id: editedCategory._id!,
+        };
         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
           method: 'PUT',
           headers: {
@@ -112,6 +115,7 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
         setEditedCategory(null);
         setCategories(categories.map(cat => cat._id === editedCategory._id ? { ...cat, name: data.name, parent: categories.find(c => c._id === data.parent) } : cat));
       } else {
+        const data: typeof baseData = baseData;
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
           method: 'POST',
           headers: {
@@ -128,14 +132,13 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
     setName('');
     setParentCategory('');
     setProperties([]);
-    
   };
   
   
   const handleEditCategory = (category: Category) => {
     setEditedCategory(category);
     setName(category.name);
-    setParentCategory(category.parent ? category.parent._id : null);
+    setParentCategory(category.parent ? category.parent._id : undefined);
     setProperties(category.properties || []);
   };
   
@@ -269,7 +272,7 @@ const handleConfirmDelete = async () => {
     <IconButton edge="end" onClick={() => { handleEditCategory(category); }}>
       <DotsThreeVerticalIcon weight="bold" />
     </IconButton>
-    <IconButton edge="end" onClick={() => { handleClickOpen(category._id); }}>
+    <IconButton edge="end" onClick={() => { category._id && handleClickOpen(category._id); }}>
       <DeleteIcon color="error" /> 
     </IconButton>
 
