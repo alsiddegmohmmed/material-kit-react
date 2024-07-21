@@ -48,6 +48,13 @@ export interface LatestCategoriesProps {
   sx?: SxProps;
 }
 
+interface CategoryResponse {
+  _id: string;
+  name: string;
+  parent?: { name: string };
+  properties: never[];
+  updatedAt: Date;
+}
 
 
 export function LatestCategories({ sx }: LatestCategoriesProps) {
@@ -67,7 +74,7 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        const data: Category[] = await response.json();
+        const data: Category[] = await response.json() as Category[];
         setCategories(data.map((category: Category) => ({
           _id: category._id,
           name: category.name,
@@ -76,11 +83,11 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
           updatedAt: category.updatedAt,
         })));
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        // console.error('Error fetching categories:', error);
       }
     };
   
-    fetchCategories();
+    void fetchCategories();
   }, []);
   
 
@@ -112,11 +119,11 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
           },
           body: JSON.stringify(data),
         });
-        const result = await response.json();
+        const result: CategoryResponse = await response.json() as CategoryResponse;
         setCategories([...categories, { ...result, parent: categories.find(c => c._id === result.parent) }]);
       }
     } catch (error) {
-      console.error('Error saving category:', error);
+      // console.error('Error saving category:', error);
     }
     setName('');
     setParentCategory('');
@@ -128,7 +135,7 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
   const handleEditCategory = (category: Category) => {
     setEditedCategory(category);
     setName(category.name);
-    setParentCategory(category.parent ? category.parent._id : ''); // Ensure parentCategory is set correctly
+    setParentCategory(category.parent ? category.parent._id : null);
     setProperties(category.properties || []);
   };
   
@@ -142,10 +149,10 @@ const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null
       if (response.ok) {
         setCategories(categories.filter(category => category._id !== categoryId));
       } else {
-        console.error('Error deleting category:', response.statusText);
+        // console.error('Error deleting category:', response.statusText);
       }
     } catch (error) {
-      console.error('Error deleting category:', error);
+      // console.error('Error deleting category:', error);
     }
   };
   
@@ -168,18 +175,18 @@ const handleConfirmDelete = async () => {
 
 
 
-  const addProperty = () => {
-    setProperties([...properties, { name: '', values: '' }]);
-  };
+  // const addProperty = () => {
+  //   setProperties([...properties, { name: '', values: '' }]);
+  // };
 
-  const handlePropertyChange = (index: number, key: string, value: string) => {
-    const updatedProperties = properties.map((property, i) => i === index ? { ...property, [key]: value } : property);
-    setProperties(updatedProperties);
-  };
+  // const handlePropertyChange = (index: number, key: string, value: string) => {
+  //   const updatedProperties = properties.map((property, i) => i === index ? { ...property, [key]: value } : property);
+  //   setProperties(updatedProperties);
+  // };
 
-  const removeProperty = (index: number) => {
-    setProperties(properties.filter((_, i) => i !== index));
-  };
+  // const removeProperty = (index: number) => {
+  //   setProperties(properties.filter((_, i) => i !== index));
+  // };
 
   return (
     <>
@@ -207,7 +214,7 @@ const handleConfirmDelete = async () => {
                 <Select
                   label="Parent Category"
                   value={parentCategory || ''} // Ensure empty string if parentCategory is null
-                  onChange={(event) => setParentCategory(event.target.value)}
+                  onChange={(event) => { setParentCategory(event.target.value); }}
                 >
                   <MenuItem value="">No Parent Category</MenuItem>
                   {categories.map((category) => (
@@ -220,8 +227,7 @@ const handleConfirmDelete = async () => {
           </CardContent>
           <Divider />
           <CardActions sx={{ justifyContent: 'flex-end' }}>
-            {editedCategory && (
-              <Button
+            {editedCategory ? <Button
                 variant="outlined"
                 onClick={() => {
                   setEditedCategory(null);
@@ -231,8 +237,7 @@ const handleConfirmDelete = async () => {
                 }}
               >
                 Cancel
-              </Button>
-            )}
+              </Button> : null}
             <Button variant="contained" type="submit">
               Save
             </Button>
@@ -261,10 +266,10 @@ const handleConfirmDelete = async () => {
       primaryTypographyProps={{ variant: 'subtitle1' }}
       secondaryTypographyProps={{ variant: 'body2' }}
     />
-    <IconButton edge="end" onClick={() => handleEditCategory(category)}>
+    <IconButton edge="end" onClick={() => { handleEditCategory(category); }}>
       <DotsThreeVerticalIcon weight="bold" />
     </IconButton>
-    <IconButton edge="end" onClick={() => handleClickOpen(category._id)}>
+    <IconButton edge="end" onClick={() => { handleClickOpen(category._id); }}>
       <DeleteIcon color="error" /> 
     </IconButton>
 
@@ -286,7 +291,7 @@ const handleConfirmDelete = async () => {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
           >
-            <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+            <DialogTitle id="alert-dialog-title">Confirm Deletion</DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
                 Are you sure you want to delete this category? This action cannot be undone.
@@ -296,7 +301,7 @@ const handleConfirmDelete = async () => {
               <Button onClick={handleClose} color="primary">
                 Cancel
               </Button>
-              <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+              <Button onClick={handleConfirmDelete} color="primary">
                 Delete
               </Button>
             </DialogActions>
