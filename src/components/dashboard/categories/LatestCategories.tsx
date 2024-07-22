@@ -44,7 +44,7 @@ interface CategoryResponse {
   _id: string;
   name: string;
   parent?: { _id: string; name: string };
-  properties: never[];
+  properties: { name: string; values: string[] }[];
   updatedAt: Date;
 }
 
@@ -52,7 +52,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState('');
   const [parentCategory, setParentCategory] = useState<string | null>(null);
-  const [properties, setProperties] = useState<{ name: string; values: string }[]>([]);
+  const [properties, setProperties] = useState<{ name: string; values: string[] }[]>([]);
   const [editedCategory, setEditedCategory] = useState<Category | null>(null);
   const [open, setOpen] = useState(false);
   const [categoryIdToDelete, setCategoryIdToDelete] = useState<string | null>(null);
@@ -85,7 +85,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
     const baseData = {
       name,
       parent: parentCategory ? { _id: parentCategory, name: categories.find(cat => cat._id === parentCategory)?.name || '' } : undefined,
-      properties: properties.map(p => ({ name: p.name, values: p.values.split(',') })),
+      properties: properties.map(p => ({ name: p.name, values: p.values })),
     };
 
     try {
@@ -102,8 +102,8 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
           body: JSON.stringify(data),
         });
         setEditedCategory(null);
-        setCategories(categories.map(cat => cat._id === editedCategory._id ? { ...cat, ...data, properties } : cat));     
-       } else {
+        setCategories(categories.map(cat => cat._id === editedCategory._id ? { ...cat, ...data } : cat));
+      } else {
         const data: typeof baseData = baseData;
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
           method: 'POST',
@@ -127,7 +127,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
     setEditedCategory(category);
     setName(category.name);
     setParentCategory(category.parent ? category.parent._id : null);
-    setProperties(category.properties.map(p => ({ name: p.name, values: p.values.join(',') })));
+    setProperties(category.properties.map(p => ({ name: p.name, values: p.values })));
   };
 
   const handleDeleteCategory = async (categoryId: string) => {
