@@ -73,7 +73,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
           updatedAt: category.updatedAt,
         })));
       } catch (error) {
-        // console.error('Error fetching categories:', error);
+        console.error('Error fetching categories:', error);
       }
     };
   
@@ -118,7 +118,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
       // Refetch categories after saving
       await fetchCategories();
     } catch (error) {
-      // console.error('Error saving category:', error);
+      console.error('Error saving category:', error);
     }
     setName('');
     setParentCategory(null);
@@ -141,7 +141,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
         updatedAt: category.updatedAt,
       })));
     } catch (error) {
-      // console.error('Error fetching categories:', error);
+      console.error('Error fetching categories:', error);
     }
   };
   
@@ -167,10 +167,10 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
       if (response.ok) {
         setCategories(categories.filter(category => category._id !== categoryId));
       } else {
-        // console.error('Error deleting category:', response.statusText);
+        console.error('Error deleting category:', response.statusText);
       }
     } catch (error) {
-      // console.error('Error deleting category:', error);
+      console.error('Error deleting category:', error);
     }
   };
 

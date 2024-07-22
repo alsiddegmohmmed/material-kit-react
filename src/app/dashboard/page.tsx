@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
+import CircularProgress from '@mui/material/CircularProgress'; // Import CircularProgress for a spinner
 
 import { Budget } from '@/components/dashboard/overview/budget';
 import { LatestOrders } from '@/components/dashboard/overview/latest-orders';
@@ -29,6 +30,7 @@ interface DashboardData {
 
 const Page: React.FC = () => {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Add loading state
 
   useEffect(() => {
     async function fetchData() {
@@ -43,14 +45,24 @@ const Page: React.FC = () => {
         setData(data);
       } catch (error) {
         console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false); // Set loading to false after data is fetched
       }
     }
 
     void fetchData();
   }, []);
 
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress /> {/* Show loading spinner */}
+      </div>
+    );
+  }
+
   if (!data) {
-    return <div>Loading...</div>;
+    return <div>Failed to load data</div>; // Handle case where data is not available
   }
 
   return (
