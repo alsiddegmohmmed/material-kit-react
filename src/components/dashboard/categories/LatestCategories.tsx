@@ -64,8 +64,8 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        const data: CategoryResponse[] = await response.json();
-        setCategories(data.map((category: CategoryResponse) => ({
+        const data: CategoryResponse[] = await response.json() as CategoryResponse[];
+                setCategories(data.map((category: CategoryResponse) => ({
           _id: category._id,
           name: category.name,
           parent: category.parent ? { _id: category.parent._id, name: category.parent.name } : undefined,
@@ -73,6 +73,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
           updatedAt: category.updatedAt,
         })));
       } catch (error) {
+         // eslint-disable-next-line no-console
         console.error('Error fetching categories:', error);
       }
     };
@@ -118,6 +119,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
       // Refetch categories after saving
       await fetchCategories();
     } catch (error) {
+       // eslint-disable-next-line no-console
       console.error('Error saving category:', error);
     }
     setName('');
@@ -132,7 +134,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      const data: CategoryResponse[] = await response.json();
+      const data: CategoryResponse[] = await response.json() as CategoryResponse[];
       setCategories(data.map((category: CategoryResponse) => ({
         _id: category._id,
         name: category.name,
@@ -141,12 +143,13 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
         updatedAt: category.updatedAt,
       })));
     } catch (error) {
+       // eslint-disable-next-line no-console
       console.error('Error fetching categories:', error);
     }
   };
   
   useEffect(() => {
-    fetchCategories();
+    void fetchCategories();
   }, []);
   
   
@@ -167,9 +170,11 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
       if (response.ok) {
         setCategories(categories.filter(category => category._id !== categoryId));
       } else {
-        console.error('Error deleting category:', response.statusText);
+        // eslint-disable-next-line no-console
+console.error('Error deleting category:', response.statusText);
       }
     } catch (error) {
+       // eslint-disable-next-line no-console
       console.error('Error deleting category:', error);
     }
   };
