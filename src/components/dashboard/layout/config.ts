@@ -6,11 +6,11 @@ export const navItems = [
   { key: 'products', title: 'products', href: paths.dashboard.products, icon: 'shop' },
   { key: 'categories', title: 'Categories', href: paths.dashboard.categories, icon: 'categories' },
   { key: 'customers', title: 'Customers', href: paths.dashboard.customers, icon: 'users' },
-  { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
-  { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
-  { key: 'account', title: 'Account', href: paths.dashboard.account, icon: 'user' },
-  { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
-  {key: 'newproduct', title: 'newproduct', href: paths.dashboard.newproduct, icon: 'plus-circle'}
+  // { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
+  // { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
+  // { key: 'account', title: 'Account', href: paths.dashboard.account, icon: 'user' },
+  { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' }
+ 
   
   
 ] satisfies NavItemConfig[];

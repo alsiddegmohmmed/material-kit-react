@@ -71,7 +71,7 @@ export function LatestOrders({ sx }: LatestOrdersProps): React.JSX.Element {
           </TableHead>
           <TableBody>
             {orders.map((order) => {
-              const { label, color } = statusMap[order.status] || { label: 'Unknown', color: 'default' };
+              const { label, color } = statusMap[order.status] || { label: 'delivered', color: 'success' };
 
               return (
                 <TableRow hover key={order._id}>
