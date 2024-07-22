@@ -73,12 +73,14 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
           updatedAt: category.updatedAt,
         })));
       } catch (error) {
-        // console.error('Error fetching categories:', error);
+        console.error('Error fetching categories:', error);
       }
     };
-
-    void fetchCategories();
+  
+    fetchCategories();
   }, []);
+  
+  
 
   const handleSaveCategory = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -87,7 +89,9 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
       parent: parentCategory ? { _id: parentCategory, name: categories.find(cat => cat._id === parentCategory)?.name || '' } : undefined,
       properties: properties.map(p => ({ name: p.name, values: p.values })),
     };
-
+  
+    console.log('Saving category with data:', baseData);
+  
     try {
       if (editedCategory) {
         const data: typeof baseData & { _id: string } = {
@@ -102,27 +106,51 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
           body: JSON.stringify(data),
         });
         setEditedCategory(null);
-        setCategories(categories.map(cat => cat._id === editedCategory._id ? { ...cat, ...data } : cat));
       } else {
-        const data: typeof baseData = baseData;
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(baseData),
         });
-        const result: CategoryResponse = await response.json()  as CategoryResponse;
-        setCategories([...categories, { ...result, parent: result.parent ? { _id: result.parent._id, name: result.parent.name } : undefined }]);
       }
+      // Refetch categories after saving
+      await fetchCategories();
     } catch (error) {
-      // console.error('Error saving category:', error);
+      console.error('Error saving category:', error);
     }
     setName('');
     setParentCategory(null);
     setProperties([]);
   };
-
+  
+  // Refetch categories from server
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data: CategoryResponse[] = await response.json();
+      setCategories(data.map((category: CategoryResponse) => ({
+        _id: category._id,
+        name: category.name,
+        parent: category.parent ? { _id: category.parent._id, name: category.parent.name } : undefined,
+        properties: category.properties,
+        updatedAt: category.updatedAt,
+      })));
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+  
+  
+  
   const handleEditCategory = (category: Category) => {
     setEditedCategory(category);
     setName(category.name);
