@@ -73,12 +73,13 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
           updatedAt: category.updatedAt,
         })));
       } catch (error) {
-        console.error('Error fetching categories:', error);
+        // console.error('Error fetching categories:', error);
       }
     };
   
-    fetchCategories();
+    void fetchCategories(); // Explicitly mark as ignored
   }, []);
+  
   
   
 
@@ -90,7 +91,6 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
       properties: properties.map(p => ({ name: p.name, values: p.values })),
     };
   
-    console.log('Saving category with data:', baseData);
   
     try {
       if (editedCategory) {
@@ -118,7 +118,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
       // Refetch categories after saving
       await fetchCategories();
     } catch (error) {
-      console.error('Error saving category:', error);
+      // console.error('Error saving category:', error);
     }
     setName('');
     setParentCategory(null);
@@ -141,7 +141,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
         updatedAt: category.updatedAt,
       })));
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      // console.error('Error fetching categories:', error);
     }
   };
   
