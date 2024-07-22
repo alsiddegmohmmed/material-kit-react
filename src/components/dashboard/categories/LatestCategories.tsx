@@ -112,7 +112,7 @@ export function LatestCategories({ sx }: LatestCategoriesProps) {
           },
           body: JSON.stringify(data),
         });
-        const result: CategoryResponse = await response.json();
+        const result: CategoryResponse = await response.json()  as CategoryResponse;
         setCategories([...categories, { ...result, parent: result.parent ? { _id: result.parent._id, name: result.parent.name } : undefined }]);
       }
     } catch (error) {
